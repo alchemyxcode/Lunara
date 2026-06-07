@@ -1,10 +1,10 @@
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
-
 import 'dart:convert';
 import 'package:webdav_client/webdav_client.dart' as webdav;
 import 'database_service.dart';
 import 'settings_service.dart';
+import 'encryption_service.dart';
 
 class SyncService {
   static final SyncService instance = SyncService._internal();
@@ -14,7 +14,6 @@ class SyncService {
     final url = await SettingsService.instance.getWebdavUrl();
     final user = await SettingsService.instance.getWebdavUser();
     final pass = await SettingsService.instance.getWebdavPass();
-
     return webdav.newClient(
       url,
       user: user,
@@ -23,7 +22,6 @@ class SyncService {
     );
   }
 
-  // Test the WebDAV connection
   Future<bool> testConnection() async {
     try {
       final client = await _getClient();
@@ -35,7 +33,6 @@ class SyncService {
     }
   }
 
-  // Create LunaFlow folder on Nextcloud if it doesn't exist
   Future<void> _ensureFolder(webdav.Client client) async {
     try {
       await client.mkdir('data');
@@ -44,17 +41,14 @@ class SyncService {
     }
   }
 
-  // Export all data to JSON and upload to Nextcloud
   Future<bool> syncToCloud() async {
     try {
       final client = await _getClient();
       await _ensureFolder(client);
 
-      // Get all data from local database
       final cycles = await DatabaseService.instance.getAllCycles();
       final logs = await DatabaseService.instance.getAllLogs();
 
-      // Build symptoms for each log
       final List<Map<String, dynamic>> logsWithSymptoms = [];
       for (final log in logs) {
         final symptoms = await DatabaseService.instance
@@ -65,7 +59,6 @@ class SyncService {
         });
       }
 
-      // Create the export object
       final exportData = {
         'exported_at': DateTime.now().toIso8601String(),
         'version': '1.0.0',
@@ -73,13 +66,15 @@ class SyncService {
         'logs': logsWithSymptoms,
       };
 
-      // Convert to JSON
       final jsonString = jsonEncode(exportData);
-      final bytes = utf8.encode(jsonString);
 
-      // Upload to Nextcloud
+      // Encrypt using the WebDAV password as the key
+      final password = await SettingsService.instance.getWebdavPass();
+      final encryptedString = EncryptionService.instance.encrypt(jsonString, password);
+      final bytes = utf8.encode(encryptedString);
+
       await client.write(
-        'data/lunaflow_data.json',
+        'data/lunaflow_data.enc',
         bytes,
       );
 
@@ -90,19 +85,19 @@ class SyncService {
     }
   }
 
-  // Download and import data from Nextcloud
   Future<bool> syncFromCloud() async {
     try {
       final client = await _getClient();
+      final password = await SettingsService.instance.getWebdavPass();
 
-      final bytes = await client.read('LunaFlow/lunaflow_data.json');
-      final jsonString = utf8.decode(bytes);
+      final bytes = await client.read('data/lunaflow_data.enc');
+      final encryptedString = utf8.decode(bytes);
+      final jsonString = EncryptionService.instance.decrypt(encryptedString, password);
+
       final data = jsonDecode(jsonString) as Map<String, dynamic>;
-
-      // Data is available — in future we'll merge it with local
-      // For now just confirm it's readable
       return data.containsKey('cycles') && data.containsKey('logs');
     } catch (e) {
+      print('Sync from cloud error: $e');
       return false;
     }
   }

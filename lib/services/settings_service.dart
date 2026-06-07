@@ -1,7 +1,7 @@
 // LunaFlow - Settings Service
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
-
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsService {
@@ -17,6 +17,9 @@ class SettingsService {
   static const String _keyAiProvider = 'ai_provider';
   static const String _keyAiApiKey = 'ai_api_key';
   static const String _keyAiEndpoint = 'ai_endpoint';
+  static const String _keyNotificationsEnabled = 'notifications_enabled';
+  static const String _keyReminderHour = 'reminder_hour';
+  static const String _keyReminderMinute = 'reminder_minute';
 
   Future<void> saveAll({
     required String name,
@@ -28,6 +31,9 @@ class SettingsService {
     required String aiProvider,
     required String aiApiKey,
     required String aiEndpoint,
+    required bool notificationsEnabled,
+    required int reminderHour,
+    required int reminderMinute,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyName, name);
@@ -39,6 +45,9 @@ class SettingsService {
     await prefs.setString(_keyAiProvider, aiProvider);
     await prefs.setString(_keyAiApiKey, aiApiKey);
     await prefs.setString(_keyAiEndpoint, aiEndpoint);
+    await prefs.setBool(_keyNotificationsEnabled, notificationsEnabled);
+    await prefs.setInt(_keyReminderHour, reminderHour);
+    await prefs.setInt(_keyReminderMinute, reminderMinute);
   }
 
   Future<Map<String, dynamic>> loadAll() async {
@@ -53,6 +62,9 @@ class SettingsService {
       'ai_provider': prefs.getString(_keyAiProvider) ?? 'Anthropic',
       'ai_api_key': prefs.getString(_keyAiApiKey) ?? '',
       'ai_endpoint': prefs.getString(_keyAiEndpoint) ?? '',
+      'notifications_enabled': prefs.getBool(_keyNotificationsEnabled) ?? false,
+      'reminder_hour': prefs.getInt(_keyReminderHour) ?? 20,
+      'reminder_minute': prefs.getInt(_keyReminderMinute) ?? 0,
     };
   }
 
@@ -99,5 +111,18 @@ class SettingsService {
   Future<String> getWebdavPass() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_keyWebdavPass) ?? '';
+  }
+
+  Future<bool> isNotificationsEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyNotificationsEnabled) ?? false;
+  }
+
+  Future<TimeOfDay> getReminderTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    return TimeOfDay(
+      hour: prefs.getInt(_keyReminderHour) ?? 20,
+      minute: prefs.getInt(_keyReminderMinute) ?? 0,
+    );
   }
 }

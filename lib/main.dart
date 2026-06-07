@@ -8,9 +8,11 @@ import 'screens/log.dart';
 import 'screens/calendar.dart';
 import 'screens/insights.dart';
 import 'screens/settings.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.instance.init();
   runApp(const LunaFlowApp());
 }
 
