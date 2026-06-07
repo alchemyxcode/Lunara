@@ -3,6 +3,7 @@
 // Licensed under GNU General Public License v3.0
 
 import 'package:flutter/material.dart';
+import '../services/database_service.dart';
 
 class LogScreen extends StatefulWidget {
   const LogScreen({super.key});
@@ -21,6 +22,7 @@ class _LogScreenState extends State<LogScreen> {
   double sleepHours = 7;
   Set<String> selectedSymptoms = {};
   final TextEditingController notesController = TextEditingController();
+  bool _isSaving = false;
 
   final List<Map<String, String>> intensityOptions = [
     {'label': 'Spotting', 'emoji': '🩸'},
@@ -85,17 +87,21 @@ class _LogScreenState extends State<LogScreen> {
   }
 
   Future<void> _logPeriod() async {
-    await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
       helpText: 'Select period start date',
-    ).then((picked) {
-      if (picked != null) {
-        setState(() {
-          selectedDate = picked;
-        });
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+      });
+      await DatabaseService.instance.logPeriodStart(
+        picked.toIso8601String().split('T')[0],
+      );
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -105,7 +111,58 @@ class _LogScreenState extends State<LogScreen> {
           ),
         );
       }
-    });
+    }
+  }
+
+  Future<void> _saveEntry() async {
+    setState(() => _isSaving = true);
+
+    try {
+      await DatabaseService.instance.saveDailyLog(
+        date: selectedDate.toIso8601String().split('T')[0],
+        flowIntensity: flowIntensity,
+        flowColour: flowColour,
+        mood: mood,
+        libido: libido,
+        energyLevel: energyLevel.toInt(),
+        sleepHours: sleepHours,
+        notes: notesController.text.isEmpty ? null : notesController.text,
+        symptoms: selectedSymptoms.toList(),
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Entry saved! 🌙'),
+            backgroundColor: Color(0xFF7B4F9E),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Reset form
+        setState(() {
+          flowIntensity = null;
+          flowColour = null;
+          mood = null;
+          libido = null;
+          energyLevel = 3;
+          sleepHours = 7;
+          selectedSymptoms = {};
+          notesController.clear();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving entry: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      setState(() => _isSaving = false);
+    }
   }
 
   @override
@@ -346,16 +403,18 @@ class _LogScreenState extends State<LogScreen> {
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Entry saved! 🌙'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.save),
-                label: const Text('Save Entry'),
+                onPressed: _isSaving ? null : _saveEntry,
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.save),
+                label: Text(_isSaving ? 'Saving...' : 'Save Entry'),
               ),
             ),
 

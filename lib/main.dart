@@ -8,7 +8,8 @@ import 'screens/log.dart';
 import 'screens/calendar.dart';
 import 'screens/insights.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const LunaFlowApp());
 }
 
