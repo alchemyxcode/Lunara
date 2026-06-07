@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import '../services/settings_service.dart';
+import '../services/sync_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -26,6 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _obscureKey = true;
   bool _isLoading = true;
   bool _isSaving = false;
+  bool _isTesting = false;
 
   @override
   void initState() {
@@ -79,6 +81,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } finally {
       setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _testSyncConnection() async {
+    await _saveSettings();
+    setState(() => _isTesting = true);
+    try {
+      final success = await SyncService.instance.testConnection();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(success
+                ? 'Connected to Disroot! ✅'
+                : 'Connection failed ❌ Check your credentials'),
+            backgroundColor:
+                success ? const Color(0xFF7B4F9E) : Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      setState(() => _isTesting = false);
     }
   }
 
@@ -194,15 +223,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Testing connection... 🌙'),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.wifi_tethering),
-                  label: const Text('Test Connection'),
+                  onPressed: _isTesting ? null : _testSyncConnection,
+                  icon: _isTesting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.wifi_tethering),
+                  label: Text(_isTesting
+                      ? 'Testing...'
+                      : 'Test Connection'),
                 ),
               ),
             ],
