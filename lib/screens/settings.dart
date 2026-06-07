@@ -28,6 +28,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isLoading = true;
   bool _isSaving = false;
   bool _isTesting = false;
+  bool _isSyncing = false;
 
   @override
   void initState() {
@@ -76,7 +77,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving settings: $e')),
+          SnackBar(content: Text('Error saving: $e')),
         );
       }
     } finally {
@@ -84,7 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _testSyncConnection() async {
+  Future<void> _testConnection() async {
     await _saveSettings();
     setState(() => _isTesting = true);
     try {
@@ -108,6 +109,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } finally {
       setState(() => _isTesting = false);
+    }
+  }
+
+  Future<void> _syncNow() async {
+    setState(() => _isSyncing = true);
+    try {
+      final success = await SyncService.instance.syncToCloud();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(success
+                ? 'Synced to Disroot! ✅'
+                : 'Sync failed ❌ Try again'),
+            backgroundColor:
+                success ? const Color(0xFF7B4F9E) : Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      setState(() => _isSyncing = false);
     }
   }
 
@@ -141,7 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // Profile section
+            // Profile
             Text('Profile',
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
@@ -158,7 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 32),
 
-            // Sync section
+            // Sync
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -173,7 +200,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Encrypt and sync your data to your own Nextcloud',
+              'Sync your data to your own Nextcloud',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
@@ -220,27 +247,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: _isTesting ? null : _testSyncConnection,
-                  icon: _isTesting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.wifi_tethering),
-                  label: Text(_isTesting
-                      ? 'Testing...'
-                      : 'Test Connection'),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _isTesting ? null : _testConnection,
+                      icon: _isTesting
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2),
+                            )
+                          : const Icon(Icons.wifi_tethering),
+                      label: Text(
+                          _isTesting ? 'Testing...' : 'Test'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: _isSyncing ? null : _syncNow,
+                      icon: _isSyncing
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.cloud_upload),
+                      label:
+                          Text(_isSyncing ? 'Syncing...' : 'Sync Now'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFF7B4F9E),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
 
             const SizedBox(height: 32),
 
-            // AI Agent section
+            // AI Agent
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -335,14 +386,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                   icon: const Icon(Icons.science_outlined),
-                  label: const Text('Test Connection'),
+                  label: const Text('Test AI Connection'),
                 ),
               ),
             ],
 
             const SizedBox(height: 32),
 
-            // Save button
+            // Save
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
@@ -363,7 +414,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 32),
 
-            // About section
+            // About
             Text('About',
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),

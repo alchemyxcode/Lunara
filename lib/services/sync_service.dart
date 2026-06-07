@@ -1,4 +1,3 @@
-// LunaFlow - Sync Service
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 
@@ -20,7 +19,7 @@ class SyncService {
       url,
       user: user,
       password: pass,
-      debug: false,
+      debug: true,
     );
   }
 
@@ -31,6 +30,7 @@ class SyncService {
       await client.ping();
       return true;
     } catch (e) {
+      print('Connection error: $e');
       return false;
     }
   }
@@ -38,7 +38,7 @@ class SyncService {
   // Create LunaFlow folder on Nextcloud if it doesn't exist
   Future<void> _ensureFolder(webdav.Client client) async {
     try {
-      await client.mkdir('LunaFlow');
+      await client.mkdir('data');
     } catch (e) {
       // Folder may already exist, that's fine
     }
@@ -79,12 +79,13 @@ class SyncService {
 
       // Upload to Nextcloud
       await client.write(
-        'LunaFlow/lunaflow_data.json',
+        'data/lunaflow_data.json',
         bytes,
       );
 
       return true;
     } catch (e) {
+      print('Sync error: $e');
       return false;
     }
   }
