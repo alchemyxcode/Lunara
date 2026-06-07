@@ -1,190 +1,91 @@
-# 🌙 LunaFlow
+# 🌙 Lunara
 
-> A private, open-source menstrual cycle and personal health tracker — built for sovereignty over your own data.
+Lunara is a privacy-first personal health tracker for women, built around the menstrual cycle. Log your period, mood, symptoms, food, and movement — and let AI help you understand the patterns in your own body.
 
-LunaFlow is a Flutter-based Android app that logs cycle data, symptoms, mood, and health metrics — syncing privately to your own Nextcloud/Disroot instance with zero third-party tracking. A self-hosted AI agent (running on your own hardware) analyses your data and provides personalised health insights including nutrition and fitness recommendations.
-
-**Your data. Your hardware. Your terms.**
+Built by a woman, for women. Local-first, encrypted, open source.
 
 ---
 
-## ✨ Features
+## Features
 
-- 📅 **Cycle tracking** — log period start/end with predicted next cycle
-- 🩸 **Flow logging** — intensity (spotting / light / medium / heavy) and colour
-- 🌡️ **Symptom tracking** — multi-select from a full symptom library (cramps, headache, bloating, fatigue, nausea, acne, breast tenderness, back pain, brain fog, appetite changes, insomnia, and more)
-- 💭 **Mood & energy** — daily mood check-in and energy level
-- 🔥 **Libido tracking** — sex drive logging (low / normal / high)
-- 😴 **Sleep logging** — hours and quality
-- 🔒 **End-to-end encrypted sync** — to your own Nextcloud/Disroot via WebDAV
-- 🤖 **Self-hosted AI health agent** — personalised nutrition and fitness insights, running on hardware you control
-- 📊 **History & charts** — visualise patterns across your cycle over time
-- 🚫 **Zero tracking** — no analytics, no ads, no cloud accounts required
+**Currently available:**
+- 🌙 Cycle tracking — log period start, flow intensity, and colour
+- 📋 Daily health log — mood, energy, sleep, libido, symptoms, and notes
+- 📅 Calendar view — visualise logged days and period days
+- 🌕 Lunar phase tracking — moon phase displayed on home screen and calendar
+- ☁️ WebDAV sync — AES-256 encrypted backup to Disroot or any Nextcloud instance
+- 🔔 Daily reminders — customisable log reminders with timezone support
 
----
-
-## 🤖 AI Health Agent
-
-LunaFlow is designed to work with a **self-hosted AI agent** running on your own dedicated machine — not on your phone, and not on a third-party cloud server.
-
-```
-📱 LunaFlow App
-    ↓ encrypted sync
-☁️  Your Nextcloud / Disroot
-    ↓
-🖥️  Your AI Machine (Ollama + Llama 3 or similar)
-    ↓
-💬  Health insights → back to your dashboard
-```
-
-The app sends an anonymised summary of your recent cycle data to a **configurable endpoint** — meaning you point it wherever you want:
-- Your own machine running [Ollama](https://ollama.ai) (fully local, recommended)
-- Your own Anthropic API key
-- Any OpenAI-compatible endpoint
-
-No AI provider is hardcoded. No data goes anywhere you haven't explicitly configured. Other users set up their own agent — nobody shares yours.
-
-> **Current development approach:** LunaFlow is being built and tested against the [Anthropic API](https://anthropic.com) (Claude). Once the AI agent layer is stable, the project will migrate to a fully self-hosted [Ollama](https://ollama.ai) + Llama 3 setup — eliminating any dependency on external APIs entirely. The transition requires changing only a few lines of configuration.
+**Coming soon:**
+- 🥗 Food tracking — log what you eat without weighing or counting calories
+- 🏃 Workout and movement logging
+- 🤖 AI health agent — pattern insights across your whole cycle
+- 📊 Insights screen — understand your monthly rhythms over time
 
 ---
 
-## 🏗️ Full Architecture
+## Privacy
 
-```
-📱 Flutter App (Android)
-    ↓ WebDAV + AES-256 encryption
-☁️  Your Nextcloud / Disroot
-    ↓ Nextcloud desktop sync
-🖥️  Your Ubuntu Machine
-    ├── Local SQLite database
-    └── Local web dashboard
-         ↕
-🤖  Your AI Machine
-    └── Ollama (Llama 3 / Mistral)
-```
+Your data belongs to you. Lunara is designed with privacy at its core:
+
+- All data is stored **locally** on your device using SQLite
+- Cloud sync is **optional** and uses **AES-256 encryption** before anything leaves your device
+- Sync is self-hosted — your data goes to **your** Nextcloud or Disroot, not our servers
+- No analytics, no tracking, no ads
+- Fully open source under the GNU GPL v3.0 license
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Mobile app | Flutter (Dart) |
-| Local storage | SQLite via `sqflite` |
-| Sync | WebDAV (`webdav_client`) |
-| Encryption | AES-256 (`encrypt` package) |
-| AI Agent | Ollama (local) / any OpenAI-compatible API |
-| Dashboard | Python + FastAPI |
+- **Flutter** (Dart) — Android app
+- **SQLite** (sqflite) — local database
+- **WebDAV** (webdav_client) — encrypted cloud sync
+- **AES-256** (encrypt) — end-to-end encryption
+- **Anthropic API / Ollama** — AI health agent (coming soon)
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### Prerequisites
+### Requirements
+- Flutter 3.44.1 or later
+- Android SDK
+- Java 17
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) (3.x or higher)
-- Android device or emulator (API 21+)
-- A [Disroot](https://disroot.org) or Nextcloud account for sync *(optional — app works fully offline)*
-
-### Installation
-
+### Run locally
 ```bash
-# Clone the repository
-git clone https://github.com/alchemyxcode/LunaFlow.git
-cd LunaFlow
-
-# Install dependencies
+git clone https://github.com/alchemyxcode/Lunara.git
+cd Lunara
 flutter pub get
-
-# Run on connected device
 flutter run
 ```
 
-### Sync Setup
+---
 
-1. Open the app and go to **Settings → Sync**
-2. Enter your Nextcloud/Disroot WebDAV URL:
-   `https://cloud.disroot.org/remote.php/dav/files/YOUR_USERNAME/`
-3. Enter your credentials
-4. Generate an encryption key — **save this in your password manager**
-5. Tap **Connect & Sync**
+## Roadmap
 
-### AI Agent Setup
-
-1. Set up [Ollama](https://ollama.ai) on your dedicated machine
-2. Pull a model: `ollama pull llama3`
-3. In the app go to **Settings → AI Agent**
-4. Enter your machine's local address: `http://YOUR_MACHINE_IP:11434`
-5. Tap **Test Connection**
+| Milestone | Status |
+|-----------|--------|
+| Core cycle & symptom logging | ✅ Complete |
+| Calendar view | ✅ Complete |
+| WebDAV sync with AES-256 encryption | ✅ Complete |
+| Lunar phase tracking | ✅ Complete |
+| Daily reminder notifications | ✅ Complete |
+| Food tracking | 🔧 In progress |
+| Workout logging | 🔧 In progress |
+| AI health agent | 📋 Planned |
+| Insights screen | 📋 Planned |
+| F-Droid submission | 📋 Planned |
 
 ---
 
-## 🗺️ Roadmap
+## License
 
-See the [Project Board](../../projects/1) for live progress.
-
-- [x] Repository setup
-- [ ] Core cycle logging UI
-- [ ] Symptom & mood tracking
-- [ ] Local SQLite storage
-- [ ] WebDAV sync to Nextcloud/Disroot
-- [ ] AES-256 encryption layer
-- [ ] AI health agent integration
-- [ ] Charts & history view
-- [ ] Reminder notifications
-- [ ] Linux desktop companion app
-- [ ] F-Droid submission
-- [ ] 🌕 Moon cycle integration & lunar phase tracking
-- [ ] ♈ Astrology module — birth chart input & cycle insights
+Lunara is licensed under the [GNU General Public License v3.0](LICENSE).
 
 ---
 
-## 🔐 Privacy
+## Credits
 
-LunaFlow is designed from the ground up for privacy:
-
-- All data is stored locally on your device first
-- Sync is optional and goes only to infrastructure you control
-- Data is AES-256 encrypted before leaving your device
-- No telemetry, no crash reporting, no analytics
-- No internet permission required except for sync
-- AI analysis runs on your own hardware — your health data never touches a third-party AI server unless you explicitly configure it to
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a PR.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes using [Conventional Commits](https://www.conventionalcommits.org):
-   - `feat:` new feature
-   - `fix:` bug fix
-   - `docs:` documentation only
-   - `refactor:` code change that isn't a fix or feature
-4. Open a Pull Request
-
----
-
-## 🙏 Acknowledgements
-
-Built with assistance from [Claude](https://claude.ai) by Anthropic.
-
----
-
-## 📄 License
-
-Licensed under the **GNU General Public License v3.0** — see [LICENSE](LICENSE) for details.
-
-Any derivative work must also be open source under GPL-3.0.
-
----
-
-## ⚠️ Disclaimer
-
-LunaFlow is not a medical device and should not be used as a substitute for professional medical advice.
-
----
-
-*Made with 🌙 by [@alchemyxcode](https://github.com/alchemyxcode)*
+Built by [@alchemyxcode](https://github.com/alchemyxcode) with assistance from Claude by Anthropic.
