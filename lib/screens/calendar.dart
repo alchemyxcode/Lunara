@@ -1,14 +1,13 @@
 // LunaFlow - Calendar Screen
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
-
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../services/database_service.dart';
+import '../services/lunar_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
-
   @override
   State<CalendarScreen> createState() => _CalendarScreenState();
 }
@@ -34,26 +33,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-
     try {
       final cycles = await DatabaseService.instance.getAllCycles();
       final logs = await DatabaseService.instance.getAllLogs();
-
       final Map<DateTime, List<String>> periodDays = {};
       final Map<DateTime, Map<String, dynamic>> logDays = {};
-
       for (final cycle in cycles) {
         final startDate = DateTime.parse(cycle['start_date']);
         final normalized = _normalizeDate(startDate);
         periodDays[normalized] = ['period'];
       }
-
       for (final log in logs) {
         final logDate = DateTime.parse(log['date']);
         final normalized = _normalizeDate(logDate);
         logDays[normalized] = log;
       }
-
       setState(() {
         _periodDays = periodDays;
         _logDays = logDays;
@@ -72,7 +66,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       _selectedDayLog = _logDays[normalized];
       _selectedDaySymptoms = null;
     });
-
     if (_selectedDayLog != null) {
       final symptoms = await DatabaseService.instance
           .getSymptomsForLog(_selectedDayLog!['id'] as int);
@@ -91,10 +84,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
       );
     }
-
     final normalized = _normalizeDate(_selectedDay!);
     final isPeriodDay = _periodDays.containsKey(normalized);
     final log = _selectedDayLog;
+    final lunar = LunarService.instance;
+    final phaseEmoji = lunar.getPhaseEmoji(_selectedDay!);
+    final phaseName = lunar.getPhaseName(_selectedDay!);
+    final isAlignment = lunar.isAlignmentDay(_selectedDay!);
 
     return Card(
       child: Padding(
@@ -102,15 +98,41 @@ class _CalendarScreenState extends State<CalendarScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '${_selectedDay!.day}/${_selectedDay!.month}/${_selectedDay!.year}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${_selectedDay!.day}/${_selectedDay!.month}/${_selectedDay!.year}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(phaseEmoji, style: const TextStyle(fontSize: 20)),
+                    const SizedBox(width: 4),
+                    Text(phaseName,
+                        style: Theme.of(context).textTheme.bodySmall),
+                  ],
+                ),
+              ],
             ),
+            if (isAlignment && isPeriodDay) ...[
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF7B4F9E),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  '✨ Cycle & moon alignment!',
+                  style: TextStyle(fontSize: 11, color: Colors.white),
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
-
             if (isPeriodDay) ...[
               const Row(
                 children: [
@@ -121,7 +143,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
               const SizedBox(height: 8),
             ],
-
             if (log != null) ...[
               if (log['flow_intensity'] != null)
                 _detailRow('Flow', log['flow_intensity']),
@@ -145,7 +166,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   spacing: 4,
                   children: _selectedDaySymptoms!
                       .map((s) => Chip(
-                            label: Text(s, style: const TextStyle(fontSize: 12)),
+                            label: Text(s,
+                                style: const TextStyle(fontSize: 12)),
                             padding: EdgeInsets.zero,
                           ))
                       .toList(),
@@ -177,6 +199,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lunar = LunarService.instance;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calendar'),
@@ -206,7 +230,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         shape: BoxShape.circle,
                       ),
                       todayDecoration: BoxDecoration(
-                        color: const Color(0xFF7B4F9E).withOpacity(0.4),
+                        color: const Color(0xFF7B4F9E).withAlpha(100),
                         shape: BoxShape.circle,
                       ),
                       markerDecoration: const BoxDecoration(
@@ -219,6 +243,34 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         final normalized = _normalizeDate(day);
                         final isPeriod = _periodDays.containsKey(normalized);
                         final hasLog = _logDays.containsKey(normalized);
+                        final phase = lunar.getPhaseName(day);
+                        final isFullMoon = lunar.isFullMoonDay(day);
+                        final isNewMoon = lunar.isNewMoonDay(day);
+
+                        Widget dayWidget = Center(
+                          child: Text('${day.day}',
+                              style: TextStyle(
+                                color: isPeriod ? Colors.white : null,
+                              )),
+                        );
+
+                        // Stack moon emoji below the day number for full/new moon
+                        if (isFullMoon || isNewMoon) {
+                          dayWidget = Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('${day.day}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isPeriod ? Colors.white : null,
+                                  )),
+                              Text(
+                                isFullMoon ? '🌕' : '🌑',
+                                style: const TextStyle(fontSize: 8),
+                              ),
+                            ],
+                          );
+                        }
 
                         if (isPeriod) {
                           return Container(
@@ -227,15 +279,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               color: Color(0xFF7B4F9E),
                               shape: BoxShape.circle,
                             ),
-                            child: Center(
-                              child: Text(
-                                '${day.day}',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
+                            child: dayWidget,
                           );
                         }
-
                         if (hasLog) {
                           return Container(
                             margin: const EdgeInsets.all(4),
@@ -246,12 +292,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               ),
                               shape: BoxShape.circle,
                             ),
-                            child: Center(
-                              child: Text('${day.day}'),
-                            ),
+                            child: dayWidget,
                           );
                         }
-
+                        if (isFullMoon || isNewMoon) {
+                          return Container(
+                            margin: const EdgeInsets.all(4),
+                            child: dayWidget,
+                          );
+                        }
                         return null;
                       },
                     ),
@@ -262,8 +311,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     child: Row(
                       children: [
                         Container(
-                          width: 12,
-                          height: 12,
+                          width: 12, height: 12,
                           decoration: const BoxDecoration(
                             color: Color(0xFF7B4F9E),
                             shape: BoxShape.circle,
@@ -273,8 +321,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         const Text('Period'),
                         const SizedBox(width: 16),
                         Container(
-                          width: 12,
-                          height: 12,
+                          width: 12, height: 12,
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: const Color(0xFF7B4F9E),
@@ -285,6 +332,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ),
                         const SizedBox(width: 4),
                         const Text('Log entry'),
+                        const SizedBox(width: 16),
+                        const Text('🌕', style: TextStyle(fontSize: 12)),
+                        const SizedBox(width: 4),
+                        const Text('Full moon'),
+                        const SizedBox(width: 16),
+                        const Text('🌑', style: TextStyle(fontSize: 12)),
+                        const SizedBox(width: 4),
+                        const Text('New moon'),
                       ],
                     ),
                   ),

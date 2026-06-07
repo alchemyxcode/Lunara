@@ -1,13 +1,12 @@
 // LunaFlow - Home Screen
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
-
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
+import '../services/lunar_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -29,29 +28,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-
     try {
       final today = DateTime.now();
       final todayStr =
           '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
-
       final cycles = await DatabaseService.instance.getAllCycles();
       final todayLog = await DatabaseService.instance.getLogForDate(todayStr);
-
       List<String> todaySymptoms = [];
       if (todayLog != null) {
         todaySymptoms = await DatabaseService.instance
             .getSymptomsForLog(todayLog['id'] as int);
       }
-
       int? dayOfCycle;
       DateTime? predictedNext;
       int? daysUntilNext;
-
       if (cycles.isNotEmpty) {
         final lastCycleStart = DateTime.parse(cycles.first['start_date']);
         dayOfCycle = today.difference(lastCycleStart).inDays + 1;
-
         int avgCycleLength = 28;
         if (cycles.length > 1) {
           int totalDays = 0;
@@ -62,13 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
           }
           avgCycleLength = (totalDays / (cycles.length - 1)).round();
         }
-
         predictedNext = lastCycleStart.add(Duration(days: avgCycleLength));
         daysUntilNext = predictedNext
             .difference(DateTime(today.year, today.month, today.day))
             .inDays;
       }
-
       setState(() {
         _lastCycle = cycles.isNotEmpty ? cycles.first : null;
         _todayLog = todayLog;
@@ -107,6 +98,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final today = DateTime.now();
+    final lunar = LunarService.instance;
+    final phaseEmoji = lunar.getPhaseEmoji(today);
+    final phaseName = lunar.getPhaseName(today);
+    final daysToFull = lunar.daysUntilFullMoon(today);
+    final daysToNew = lunar.daysUntilNewMoon(today);
+    final isAlignment = lunar.isAlignmentDay(today);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('🌙 LunaFlow'),
@@ -128,7 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     // Greeting
                     Card(
                       child: Padding(
@@ -142,14 +140,88 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _formatDate(DateTime.now()),
+                              _formatDate(today),
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
 
+                    // Moon phase card
+                    Card(
+                      color: isAlignment
+                          ? const Color(0xFF7B4F9E).withAlpha(40)
+                          : null,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Moon Phase',
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                if (isAlignment)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF7B4F9E),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Text(
+                                      'Alignment ✨',
+                                      style: TextStyle(
+                                          fontSize: 11, color: Colors.white),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Text(phaseEmoji,
+                                    style: const TextStyle(fontSize: 48)),
+                                const SizedBox(width: 16),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      phaseName,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      daysToFull == 0
+                                          ? 'Full moon tonight 🌕'
+                                          : '$daysToFull days to full moon',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall,
+                                    ),
+                                    Text(
+                                      daysToNew == 0
+                                          ? 'New moon tonight 🌑'
+                                          : '$daysToNew days to new moon',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 16),
 
                     // Countdown card
@@ -190,7 +262,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-
                     const SizedBox(height: 16),
 
                     // Cycle status card
@@ -205,7 +276,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 12),
-
                             if (_lastCycle == null) ...[
                               const Row(
                                 children: [
@@ -215,8 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                               const SizedBox(height: 4),
-                              const Text(
-                                  'Tap Log to record your first period'),
+                              const Text('Tap Log to record your first period'),
                             ] else ...[
                               Row(
                                 children: [
@@ -244,7 +313,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 16),
 
                     // Today's log card
@@ -259,7 +327,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 12),
-
                             if (_todayLog == null) ...[
                               const Row(
                                 children: [
@@ -283,8 +350,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                               if (_todayLog!['energy_level'] != null) ...[
                                 const SizedBox(height: 4),
-                                Text(
-                                    'Energy: ${_todayLog!['energy_level']}/5'),
+                                Text('Energy: ${_todayLog!['energy_level']}/5'),
                               ],
                               if (_todaySymptoms.isNotEmpty) ...[
                                 const SizedBox(height: 8),
@@ -306,7 +372,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
                   ],
                 ),
