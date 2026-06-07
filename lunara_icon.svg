@@ -1,0 +1,39 @@
+<svg width="680" height="680" viewBox="0 0 680 680" role="img" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2D1B4E"/>
+      <stop offset="100%" stop-color="#0F0720"/>
+    </radialGradient>
+    <mask id="crescentMask">
+      <circle cx="310" cy="270" r="155" fill="white"/>
+      <circle cx="390" cy="230" r="140" fill="black"/>
+    </mask>
+  </defs>
+  <rect width="680" height="680" rx="140" fill="url(#bg2)"/>
+  <circle cx="310" cy="270" r="180" fill="#C9962A" opacity="0.12"/>
+  <circle cx="310" cy="270" r="155" fill="#F0C050" mask="url(#crescentMask)"/>
+  <circle cx="310" cy="270" r="155" fill="none" stroke="#F5D78E" stroke-width="1.5" opacity="0.3" mask="url(#crescentMask)"/>
+  <g opacity="0.9">
+    <polygon points="200,110 204,123 217,123 207,131 211,144 200,136 189,144 193,131 183,123 196,123" fill="#F5D78E"/>
+    <polygon points="490,150 493,160 503,160 495,166 498,176 490,170 482,176 485,166 477,160 487,160" fill="#F5D78E"/>
+    <polygon points="145,360 148,368 156,368 150,373 152,381 145,376 138,381 140,373 134,368 142,368" fill="#F5D78E"/>
+    <polygon points="535,330 537,337 544,337 539,341 541,348 535,344 529,348 531,341 526,337 533,337" fill="#F5D78E"/>
+    <polygon points="350,95 352,101 358,101 353,105 355,111 350,107 345,111 347,105 342,101 348,101" fill="#F5D78E"/>
+    <polygon points="450,410 452,416 458,416 453,420 455,426 450,422 445,426 447,420 442,416 448,416" fill="#F5D78E"/>
+  </g>
+  <circle cx="185" cy="195" r="2.5" fill="#C9A8E8" opacity="0.8"/>
+  <circle cx="510" cy="175" r="2" fill="#C9A8E8" opacity="0.8"/>
+  <circle cx="155" cy="430" r="2" fill="#C9A8E8" opacity="0.6"/>
+  <circle cx="525" cy="410" r="2.5" fill="#C9A8E8" opacity="0.7"/>
+  <circle cx="275" cy="125" r="1.5" fill="#C9A8E8" opacity="0.7"/>
+  <circle cx="470" cy="120" r="1.5" fill="#C9A8E8" opacity="0.6"/>
+  <circle cx="215" cy="470" r="1.5" fill="#C9A8E8" opacity="0.5"/>
+  <circle cx="495" cy="465" r="2" fill="#C9A8E8" opacity="0.6"/>
+  <g opacity="0.65">
+    <line x1="340" y1="488" x2="340" y2="515" stroke="#C9962A" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="320" y1="500" x2="360" y2="500" stroke="#C9962A" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="326" y1="491" x2="354" y2="509" stroke="#C9962A" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+    <line x1="326" y1="509" x2="354" y2="491" stroke="#C9962A" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+  </g>
+  <text x="340" y="618" text-anchor="middle" font-family="Georgia, serif" font-size="38" font-weight="700" fill="#F5D78E" letter-spacing="6">LUNARA</text>
+</svg>
