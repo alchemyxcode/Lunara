@@ -134,6 +134,8 @@ See the [Project Board](../../projects/1) for live progress.
 - [ ] Reminder notifications
 - [ ] Linux desktop companion app
 - [ ] F-Droid submission
+- [ ] 🌕 Moon cycle integration & lunar phase tracking
+- [ ] ♈ Astrology module — birth chart input & cycle insights
 
 ---
 
@@ -185,5 +187,4 @@ LunaFlow is not a medical device and should not be used as a substitute for prof
 
 ---
 
-*Made with 🌙 by [@alchemyxcode](https://github.com/alchemyxcode)*# LunaFlow
-Period tracking app. Privacy focused no data collected unless offered for app improvement. Mostly for personal use to begin with. Built with the help of Claude**
+*Made with 🌙 by [@alchemyxcode](https://github.com/alchemyxcode)*

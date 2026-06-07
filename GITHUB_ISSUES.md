@@ -218,3 +218,39 @@ As a developer, I want to submit LunaFlow to F-Droid so that privacy-conscious u
 - App icon and screenshots added to metadata
 - F-Droid submission merge request opened on fdroiddata repository
 - Build passes F-Droid's automated checker
+
+---
+
+## MILESTONE 5: Astrology & Moon
+
+---
+
+### Issue 13 — Lunar phase tracking
+**Labels:** `feature` `ui`
+**Milestone:** Milestone 5 — Astrology & Moon
+
+As a user, I want to see the current lunar phase alongside my cycle data so that I can explore the relationship between moon cycles and my menstrual cycle.
+
+**Acceptance criteria:**
+- Current moon phase displayed on home screen (new / waxing crescent / first quarter / waxing gibbous / full / waning gibbous / last quarter / waning crescent)
+- Moon phase shown on calendar view for each day
+- Lunar phase calculated locally — no API call required
+- Historical view showing which phase you were in on any logged day
+- Optional: highlight days where your cycle and full/new moon aligned
+
+---
+
+### Issue 14 — Astrology module & birth chart insights
+**Labels:** `feature` `ui` `ai`
+**Milestone:** Milestone 5 — Astrology & Moon
+
+As a user, I want to enter my birth information and receive astrological insights alongside my cycle data so that I can explore how my chart relates to my health and energy patterns.
+
+**Acceptance criteria:**
+- Birth data input screen: date, time, and place of birth
+- Birth chart calculated locally (sun, moon, rising sign at minimum)
+- Moon sign displayed prominently — moon sign is most relevant to cycle and emotional patterns
+- AI agent given birth chart context alongside cycle data to enrich recommendations
+- Daily insight card: current transits relevant to cycle phase and energy
+- All calculations done on device — no data sent to astrology APIs
+- Clearly labelled as wellness/personal insight, not medical advice
