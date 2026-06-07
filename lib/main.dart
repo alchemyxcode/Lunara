@@ -7,6 +7,7 @@ import 'screens/home.dart';
 import 'screens/log.dart';
 import 'screens/calendar.dart';
 import 'screens/insights.dart';
+import 'screens/settings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +50,7 @@ class _MainShellState extends State<MainShell> {
     LogScreen(),
     CalendarScreen(),
     InsightsScreen(),
+    SettingsScreen(),
   ];
 
   final List<NavigationDestination> _destinations = const [
@@ -71,6 +73,11 @@ class _MainShellState extends State<MainShell> {
       icon: Icon(Icons.auto_awesome_outlined),
       selectedIcon: Icon(Icons.auto_awesome),
       label: 'Insights',
+    ),
+    NavigationDestination(
+      icon: Icon(Icons.settings_outlined),
+      selectedIcon: Icon(Icons.settings),
+      label: 'Settings',
     ),
   ];
 
