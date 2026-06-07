@@ -117,3 +117,13 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+# Secrets — never commit these
+
+.env
+.env.*
+*.env
+api_keys.dart
+secrets.dart
+**/assets/secrets/
+*.keystore
+config/secrets.json
