@@ -1,4 +1,4 @@
-// LunaFlow - Personal cycle & health tracker
+// Lunara - Personal cycle & health tracker
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 
@@ -13,16 +13,16 @@ import 'services/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.instance.init();
-  runApp(const LunaFlowApp());
+  runApp(const LunaraApp());
 }
 
-class LunaFlowApp extends StatelessWidget {
-  const LunaFlowApp({super.key});
+class LunaraApp extends StatelessWidget {
+  const LunaraApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'LunaFlow',
+      title: 'Lunara',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(

@@ -1,4 +1,4 @@
-// LunaFlow - Settings Service
+// Lunara - Settings Service
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 import 'package:flutter/material.dart';
@@ -54,7 +54,7 @@ class SettingsService {
     final prefs = await SharedPreferences.getInstance();
     return {
       'name': prefs.getString(_keyName) ?? 'Deanna',
-      'webdav_url': prefs.getString(_keyWebdavUrl) ?? 'https://cloud.disroot.org/remote.php/dav/files/USERNAME/LunaFlow/',
+      'webdav_url': prefs.getString(_keyWebdavUrl) ?? 'https://cloud.disroot.org/remote.php/dav/files/USERNAME/Lunara/',
       'webdav_user': prefs.getString(_keyWebdavUser) ?? '',
       'webdav_pass': prefs.getString(_keyWebdavPass) ?? '',
       'sync_enabled': prefs.getBool(_keySyncEnabled) ?? false,

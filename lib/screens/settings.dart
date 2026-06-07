@@ -1,4 +1,4 @@
-// LunaFlow - Settings Screen
+// Lunara - Settings Screen
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 
@@ -438,7 +438,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('LunaFlow v1.0.0'),
+                    const Text('Lunara v1.0.0'),
                     const SizedBox(height: 4),
                     const Text('Licensed under GNU GPL v3.0'),
                     const SizedBox(height: 4),

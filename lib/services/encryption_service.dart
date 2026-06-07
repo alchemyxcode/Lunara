@@ -1,4 +1,4 @@
-// LunaFlow - Encryption Service
+// Lunara - Encryption Service
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 import 'dart:convert';

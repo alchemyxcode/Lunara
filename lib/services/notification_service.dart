@@ -1,4 +1,4 @@
-// LunaFlow - Notification Service
+// Lunara - Notification Service
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 import 'package:flutter/material.dart';
@@ -33,7 +33,7 @@ class NotificationService {
 
   Future<void> sendTestNotification() async {
     const androidDetails = AndroidNotificationDetails(
-      'lunaflow_log_reminder',
+      'lunara_log_reminder',
       'Daily Log Reminder',
       channelDescription: 'Reminds you to log your symptoms each day',
       importance: Importance.max,
@@ -65,7 +65,7 @@ class NotificationService {
     }
 
     const androidDetails = AndroidNotificationDetails(
-      'lunaflow_log_reminder',
+      'lunara_log_reminder',
       'Daily Log Reminder',
       channelDescription: 'Reminds you to log your symptoms each day',
       importance: Importance.max,
@@ -75,7 +75,7 @@ class NotificationService {
     await _plugin.zonedSchedule(
       id: _dailyLogReminderId,
       title: '🌙 Time to log!',
-      body: 'How are you feeling today? Tap to open LunaFlow.',
+      body: 'How are you feeling today? Tap to open Lunara.',
       scheduledDate: scheduled,
       notificationDetails: const NotificationDetails(android: androidDetails),
       androidScheduleMode: AndroidScheduleMode.inexact,

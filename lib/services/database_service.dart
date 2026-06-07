@@ -1,4 +1,4 @@
-// LunaFlow - Database Service
+// Lunara - Database Service
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 
@@ -19,7 +19,7 @@ class DatabaseService {
 
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'lunaflow.db');
+    final path = join(dbPath, 'lunara.db');
 
     return await openDatabase(
       path,

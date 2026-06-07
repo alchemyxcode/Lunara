@@ -1,4 +1,4 @@
-// LunaFlow - Log Screen
+// Lunara - Log Screen
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 

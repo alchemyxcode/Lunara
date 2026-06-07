@@ -1,4 +1,4 @@
-// LunaFlow - Calendar Screen
+// Lunara - Calendar Screen
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 import 'package:flutter/material.dart';

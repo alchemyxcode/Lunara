@@ -74,7 +74,7 @@ class SyncService {
       final bytes = utf8.encode(encryptedString);
 
       await client.write(
-        'data/lunaflow_data.enc',
+        'data/lunara_data.enc',
         bytes,
       );
 
@@ -90,7 +90,7 @@ class SyncService {
       final client = await _getClient();
       final password = await SettingsService.instance.getWebdavPass();
 
-      final bytes = await client.read('data/lunaflow_data.enc');
+      final bytes = await client.read('data/lunara_data.enc');
       final encryptedString = utf8.decode(bytes);
       final jsonString = EncryptionService.instance.decrypt(encryptedString, password);
 

@@ -1,4 +1,4 @@
-package com.alchemyxcode.lunaflow
+package com.alchemyxcode.lunara
 
 import io.flutter.embedding.android.FlutterActivity
 

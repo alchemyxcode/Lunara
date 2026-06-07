@@ -1,4 +1,4 @@
-// LunaFlow - Home Screen
+// Lunara - Home Screen
 // Copyright (C) 2026 alchemyxcode
 // Licensed under GNU General Public License v3.0
 import 'package:flutter/material.dart';
@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🌙 LunaFlow'),
+        title: const Text('🌙 Lunara'),
         centerTitle: true,
         actions: [
           IconButton(
