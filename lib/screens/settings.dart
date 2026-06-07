@@ -3,6 +3,7 @@
 // Licensed under GNU General Public License v3.0
 
 import 'package:flutter/material.dart';
+import '../services/settings_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,10 +13,8 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final _nameController = TextEditingController(text: 'Deanna');
-  final _webdavUrlController = TextEditingController(
-    text: 'https://cloud.disroot.org/remote.php/dav/files/USERNAME/LunaFlow/',
-  );
+  final _nameController = TextEditingController();
+  final _webdavUrlController = TextEditingController();
   final _webdavUserController = TextEditingController();
   final _webdavPassController = TextEditingController();
   final _aiEndpointController = TextEditingController();
@@ -25,6 +24,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _aiEnabled = false;
   bool _obscurePass = true;
   bool _obscureKey = true;
+  bool _isLoading = true;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final settings = await SettingsService.instance.loadAll();
+    setState(() {
+      _nameController.text = settings['name'];
+      _webdavUrlController.text = settings['webdav_url'];
+      _webdavUserController.text = settings['webdav_user'];
+      _webdavPassController.text = settings['webdav_pass'];
+      _syncEnabled = settings['sync_enabled'];
+      _aiEnabled = settings['ai_enabled'];
+      _aiProvider = settings['ai_provider'];
+      _aiApiKeyController.text = settings['ai_api_key'];
+      _aiEndpointController.text = settings['ai_endpoint'];
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _saveSettings() async {
+    setState(() => _isSaving = true);
+    try {
+      await SettingsService.instance.saveAll(
+        name: _nameController.text,
+        webdavUrl: _webdavUrlController.text,
+        webdavUser: _webdavUserController.text,
+        webdavPass: _webdavPassController.text,
+        syncEnabled: _syncEnabled,
+        aiEnabled: _aiEnabled,
+        aiProvider: _aiProvider,
+        aiApiKey: _aiApiKeyController.text,
+        aiEndpoint: _aiEndpointController.text,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Settings saved! 🌙'),
+            backgroundColor: Color(0xFF7B4F9E),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving settings: $e')),
+        );
+      }
+    } finally {
+      setState(() => _isSaving = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -39,6 +95,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -253,16 +315,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Settings saved! 🌙'),
-                      backgroundColor: Color(0xFF7B4F9E),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.save),
-                label: const Text('Save Settings'),
+                onPressed: _isSaving ? null : _saveSettings,
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.save),
+                label: Text(_isSaving ? 'Saving...' : 'Save Settings'),
               ),
             ),
 
